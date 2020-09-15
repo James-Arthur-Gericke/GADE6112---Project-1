@@ -1,0 +1,290 @@
+abstract class TileClass
+	{
+
+		public enum tileType
+		{
+			Hero,
+			Weapon,
+			Gold,
+			Enemy
+		}
+		protected int x;
+		protected int y;
+		
+		public int X
+		{
+			get { return x; }
+			set { x = value; }
+
+		}
+		public int Y
+		{
+			get { return y; }
+			set { y = value; }
+
+		}
+		private tileType Type;
+
+		public tileType type
+		{
+			get { return Type; }
+			set { Type = value; }
+		}
+
+		public TileClass(int Xtemp, int Ytemp, tileType typetemp)
+		{
+			this.x = Xtemp;
+			this.y = Ytemp;
+			type = typetemp;
+		}
+
+		public class Obstacle 
+		{
+			public Obstacle(int x, int y)
+			{
+
+			}
+			public class EmptyTile
+			{
+				public EmptyTile(int X, int Y)
+				{
+					
+				}
+			}
+		}
+
+	}
+}
+
+class MapClass
+	{
+		Random roll = new Random();
+		
+		public int width { get; set; }
+		public TileClass[,] Map { get; set; }
+		public EnemyClass[] Enemies { get; set; }
+		public int height { get; set; }
+		public MapClass(int widthMin, int widthMax, int heightMin, int heightMax, int numofEnemies)
+		{
+			Enemies = new EnemyClass[numofEnemies];
+			width = 10;
+			height = 10;
+			Map = new TileClass[height, width];
+
+			TileClass hero = Create(TileClass.tileType.Hero);
+			Map[hero.X, hero.Y] = hero;
+
+			for (int i = 0; i < numofEnemies; i++)
+			{
+				TileClass goblin = Create(TileClass.tileType.Enemy);
+				Map[goblin.X, goblin.Y] = goblin;
+			}
+		}
+
+	
+		public override string ToString()
+		{
+			return base.ToString();
+		}
+
+		int randomRoll(int value1, int value2)
+		{
+			return roll.Next(value1, value2);
+
+		}
+		public void UpdateVision()
+		{
+
+		}
+		
+		TileClass Create(TileClass.tileType type)
+		{
+			TileClass temp = null;
+
+			int x = randomRoll(0, width);
+			int y = randomRoll(0, height);
+
+			while(Map[x,y] != null)
+			{
+				x = randomRoll(0, width);
+				y = randomRoll(0, height);
+			}
+
+			switch(type)
+			{
+				case TileClass.tileType.Enemy:
+					GoblinClass newgoblin = new GoblinClass(10,100,1,null,x,y, TileClass.tileType.Enemy);
+					temp = newgoblin;
+					break;
+				case TileClass.tileType.Hero:
+					HeroClass newhero = new HeroClass(10, 100, 2, null, x, y, TileClass.tileType.Hero);
+					temp = newhero;
+					break;
+
+			}
+			return temp;
+		}
+	}
+}
+
+class HeroClass : CharacterClass
+	{
+		protected int HeroHP;
+		public int herohp
+		{
+			get
+			{
+				return HeroHP;
+			}
+			set 
+			{
+				HeroHP = value;
+			}
+		}
+		protected int HeroMaxHP;
+		public int heromaxhp
+		{
+			get
+			{
+				return HeroMaxHP;
+			}
+			set
+			{
+				HeroMaxHP = value;
+			}
+		}
+		protected int HeroDamage = 2;
+		public int herodamage
+		{
+			get
+			{
+				return HeroDamage;
+			}
+			set
+			{
+				HeroDamage = value;
+			}
+		}
+
+		public HeroClass(int hp, int maxHP, int damage, TileClass[] characterVision, int x, int y, tileType typetemp) : base(hp, maxHP, damage, characterVision, x, y,typetemp)
+		{
+			HeroHP = hp;
+			HeroMaxHP = maxHP;
+			HeroDamage = damage;
+		}
+
+		public override string ToString()
+		{
+			string infoDisplay = "";
+			infoDisplay += "Player Stats:" + HeroHP.ToString() + "\n";
+			infoDisplay += x.ToString() ;
+			infoDisplay += y.ToString() ;
+			infoDisplay += "Damage: 2"+ damage.ToString() + "\n";
+			return infoDisplay;
+			throw new NotImplementedException();
+		}
+	}
+}
+
+class GoblinClass : EnemyClass
+	{
+		protected int GoblinHp = 10;
+		public int goblinhp
+		{
+			get
+			{
+				return GoblinHp;
+			}
+			set
+			{
+				GoblinHp = value;
+			}
+		}
+		protected int Goblindamage;
+		public int goblindamage
+		{
+			get
+			{
+				return Goblindamage;
+			}
+			set
+			{
+				Goblindamage = value;
+			}
+		}
+
+		public GoblinClass(int hp, int maxHP, int damage, TileClass[] characterVision, int x, int y, tileType typetemp) : base(hp, maxHP, damage, characterVision, x, y, typetemp)
+		{
+			GoblinHp = hp;
+			Goblindamage = damage;
+		}
+		
+		
+	}
+	
+}
+
+class GameEnginClass
+	{
+		private char[,] map;
+
+		public GameEnginClass()
+		{
+			Mclass = new MapClass(0,10,0,10,2);
+		}
+		MapClass Mclass;
+		public char[,] Map
+		{
+			get
+			{
+				return map;
+			}
+			set
+			{
+				map = value;
+			}
+		}
+		public bool MovePlayer(CharacterClass.Movement direction)
+		{
+			return true;
+		}
+
+		public override string ToString()
+		{
+			string disply = "";
+			for (int y = 0; y < Mclass.height; y++)
+			{
+				for (int x = 0; x < Mclass.width; x++)
+				{
+					if (Mclass.Map[x, y] == null)
+					{
+						disply += ".";
+					}
+					else if (Mclass.Map[x,y].type.Equals(TileClass.tileType.Hero))
+					{
+						disply += "H";
+					}
+					else if(Mclass.Map[x, y].type.Equals(TileClass.tileType.Enemy))
+					{
+						disply += "G";
+					}
+					if (y == 0 || y == Mclass.width - 1)
+					{
+						disply += "X";
+					}
+					else
+					{
+						if (y == 0 || y == Mclass.height - 1)
+						{
+							disply += "X";
+						}
+					}
+				}
+				disply += "\n";
+			}
+
+			return disply;
+	
+		}
+	}
+}
